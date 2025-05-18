@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dark Calendar Widget</title>
+  <style>
+    body {
+      background-color: transparent;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 1rem;
+    }
+    .event {
+      background-color: transparent;
+      padding: 12px;
+      margin: 10px 0;
+      border-left: 4px solid #00ffc3;
+      border-radius: 8px;
+    }
+    .event-time {
+      color: #bbbbbb;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <h2>Upcoming Events</h2>
+  <div id="events">Loading events...</div>
+
+  <script>
+    const apiKey = 'AIzaSyANyxRiUCn3kZp3tUkU4EqHnCaezUL3NFs'; // 🔁 Replace with your API key
+    const calendarId = 'sandramtzd@gmail.com'; // 🔁 Replace with your calendar ID
+    const maxResults = 10;
+    const timeMin = new Date().toISOString();
+
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?key=${apiKey}&timeMin=${timeMin}&maxResults=${maxResults}&singleEvents=true&orderBy=startTime`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const container = document.getElementById('events');
+        container.innerHTML = '';
+        if (!data.items || data.items.length === 0) {
+          container.innerHTML = 'No upcoming events.';
+          return;
+        }
+        data.items.forEach(event => {
+          const start = event.start.dateTime || event.start.date;
+          const formattedTime = new Date(start).toLocaleString();
+          container.innerHTML += `
+            <div class="event">
+              <strong>${event.summary || 'No title'}</strong><br>
+              <span class="event-time">${formattedTime}</span>
+            </div>
+          `;
+        });
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('events').innerText = 'Failed to load events.';
+      });
+  </script>
+</body>
+</html>
